@@ -53,7 +53,7 @@ CNFSConnection& CNFSConnection::Get()
 }
 
 CNFSConnection::CNFSConnection()
-: m_pNfsContext(NULL)
+: m_pNfsContext(nullptr)
 , m_exportPath("")
 , m_hostName("")
 , m_resolvedHostName("")
@@ -84,7 +84,7 @@ std::list<std::string> CNFSConnection::GetExportList()
   exportlist = mount_getexports(m_resolvedHostName.c_str());
   tmp = exportlist;
 
-  for(tmp = exportlist; tmp!=NULL; tmp=tmp->ex_next)
+  for(tmp = exportlist; tmp!=nullptr; tmp=tmp->ex_next)
   {
     retList.push_back(std::string(tmp->ex_dir));
   }
@@ -108,7 +108,7 @@ void CNFSConnection::clearMembers()
   m_exportList.clear();
   m_writeChunkSize = 0;
   m_readChunkSize = 0;
-  m_pNfsContext = NULL;
+  m_pNfsContext = nullptr;
 }
 
 void CNFSConnection::destroyOpenContexts()
@@ -136,7 +136,7 @@ void CNFSConnection::destroyContext(const std::string& exportName)
 
 struct nfs_context *CNFSConnection::getContextFromMap(const std::string& exportname, bool forceCacheHit/* = false*/)
 {
-  struct nfs_context *pRet = NULL;
+  struct nfs_context *pRet = nullptr;
   m_openContextLock.Lock();
 
   tOpenContextMap::iterator it = m_openContextMap.find(exportname);
@@ -157,7 +157,7 @@ struct nfs_context *CNFSConnection::getContextFromMap(const std::string& exportn
     else
     {
       //context is timed out
-      //destroy it and return NULL
+      //destroy it and return nullptr
       kodi::Log(ADDON_LOG_DEBUG, "NFS: Old context timed out - destroying it");
       nfs_destroy_context(it->second.pContext);
       m_openContextMap.erase(it);
@@ -294,7 +294,7 @@ bool CNFSConnection::Connect(const VFSURL& url, std::string& relativePath)
     m_hostName = url.hostname;
     //read chunksize only works after mount
     m_readChunkSize = nfs_get_readmax(m_pNfsContext);
-    m_writeChunkSize =nfs_get_writemax(m_pNfsContext);
+    m_writeChunkSize = nfs_get_writemax(m_pNfsContext);
 
     if(contextRet == CONTEXT_NEW)
     {
@@ -309,7 +309,7 @@ void CNFSConnection::Deinit()
   if(m_pNfsContext)
   {
     destroyOpenContexts();
-    m_pNfsContext = NULL;
+    m_pNfsContext = nullptr;
   }
   clearMembers();
   // clear any keep alive timouts on deinit
@@ -321,7 +321,7 @@ void CNFSConnection::CheckIfIdle()
 {
   /* We check if there are open connections. This is done without a lock to not halt the mainthread. It should be thread safe as
    worst case scenario is that m_OpenConnections could read 0 and then changed to 1 if this happens it will enter the if wich will lead to another check, wich is locked.  */
-  if (m_OpenConnections == 0 && m_pNfsContext != NULL)
+  if (m_OpenConnections == 0 && m_pNfsContext != nullptr)
   { /* I've set the the maximum IDLE time to be 1 min and 30 sec. */
     P8PLATFORM::CLockObject lock(*this);
     if (m_OpenConnections == 0 /* check again - when locked */)
@@ -338,7 +338,7 @@ void CNFSConnection::CheckIfIdle()
     }
   }
 
-  if( m_pNfsContext != NULL )
+  if( m_pNfsContext != nullptr )
   {
     P8PLATFORM::CLockObject lock(m_keepAliveLock);
     //handle keep alive on opened files
@@ -413,7 +413,7 @@ int CNFSConnection::stat(const VFSURL& url, struct stat *statbuff)
   int nfsRet = 0;
   std::string exportPath;
   std::string relativePath;
-  struct nfs_context *pTmpContext = NULL;
+  struct nfs_context *pTmpContext = nullptr;
 
   resolveHost(url.hostname);
 
